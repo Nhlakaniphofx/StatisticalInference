@@ -1,0 +1,70 @@
+---
+title: "Statistical Inference - Course Project Part 1"
+author: "Nhlakanipho"
+date: "08 July 2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Synopsis
+This project is an inplementation of material covered inthe Statistical Inference Coursera Data Science class. Part 1 similates the exponetial distrubution means to compare to the Central Limit Theorem estimation of the distibution of these means. Part 2 is on hypothesis testing for the data given by ToothGrowth in the R datasets package.
+
+## Part 1 - Simulatioon Exercise
+###Overview
+In this part of the paper we simulate 1000 averages for Exponential Distribution with 40 exponetials and determine the mean and variance of the sample vs the theoretical respectively. Then finally try to determine if the Sample(Exponential) Distribution apprximate the Normal Distribution under the Central Limit Theorem.
+
+1. We start by seeding our data to cater for reproducibility then we continue to similate 1000 averages for a Exponetial Distribution with 40 Exponetials. Then compare the sample mean to the Central Limit Theorem approximation of the Mean.
+
+```{r, include=TRUE}
+set.seed(200)
+mns = NULL
+for (i in 1 : 1000) mns = c(mns, mean(rexp(40, 0.2)))
+```
+
+1.1. Get the mean of the simulated averages.
+```{r, include=TRUE}
+mean(mns)
+```
+1.2. Get theoretical mean using Central Limit Theorem ($\mu$ = 1/$\lambda$).
+```{r, include=TRUE}
+1/0.2
+```
+
+The sample mean value of 5.043053 vs the theorectical mean value of 5 are not that farely similar.
+
+2. Using the same simulation as above. We now compare the sample variance to the Central Limit Theorem approximation of the Sample Mean.
+
+2.1. Get the variance of the simulated averages
+```{r, include=TRUE}
+var(mns)
+```
+
+2.2. Get theoretical variance using Central Limit Theorem ($\sigma$ = (1/$\lambda$^2)*(1/n))
+```{r, include=TRUE}
+(1/0.2)^2/40
+```
+
+The sample variance value of 0.6026047 vs the theorectical mean value of 0.625 are not that farely similar.
+
+3. Finally we distiguish how well does the Central Limt Theorem approximates the Exponential Distribution with 1000 simulation off averages of 40 Exponential.
+
+```{r, include=TRUE}
+library(data.table)
+library("ggplot2")
+plotdata <- data.frame(mns)
+finalPlot <- ggplot(plotdata, aes(x =mns))
+finalPlot <- finalPlot + geom_histogram(aes(y=..density..), colour="black",fill = "lightblue",binwidth = 0.05)
+finalPlot <- finalPlot + labs(title = "Distribution of Averages of 40 Samples on 1000 Simulations", x = "Mean of 40 Samples", y = "Density")
+finalPlot <- finalPlot + geom_vline(aes(xintercept = mean(mns),colour = "SampleMean"))
+finalPlot <- finalPlot + geom_vline(aes(xintercept = 1/0.2, colour = "TheorecticalMean")) 
+finalPlot <- finalPlot + scale_colour_manual("",values = c("TheorecticalMean"="red","SampleMean"="blue"))
+finalPlot <- finalPlot + stat_function(fun = dnorm, args = list(mean = mean(mns), sd = var(mns)), color = "blue", size = 1.0)
+finalPlot <- finalPlot + stat_function(fun = dnorm, args = list(mean = 1/0.2, sd = (1/0.2)^2/40), colour = "red", size = 1.0)
+plot(finalPlot)
+```
+
+The above digram shows the sample and theorectical distribution overlayed on the simulated averaged of the exponential distribution with an exponential of 40.
+
+# Conclusion 
+The exponential distribution can be approximated using the central limit theorem since it means of the simulations followed a Gaussian function with slit difference between the mean and variance of the theoretical and sample distributions.

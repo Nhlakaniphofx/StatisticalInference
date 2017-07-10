@@ -1,0 +1,82 @@
+---
+title: "Statistical Inference - Course Project Part2"
+author: "Nhlakanipho"
+date: "08 July 2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Part 2 - Basic Inferential Data Analysis
+###Overview
+In this part of the paper we look at the ToothGrowth data which is part of the dataset package in R to see if there is any significant toothe growth using different suppliments and dosages.
+
+1. Load and provide some basic exploratory data analysis
+1.1. Data Intergrity
+```{r, echo=TRUE}
+# Since dosages are some form of treatment in this data we would want to quantify they results of each measure
+ToothGrowth$dose<-as.factor(ToothGrowth$dose)
+summary(ToothGrowth)
+```
+
+```{r, echo=TRUE}
+#High level view of data to get variables and structure of data
+head(ToothGrowth)
+```
+
+```{r, echo=TRUE}
+#Check for NULL values in tooth growth length
+sum(is.na(ToothGrowth$len))
+```
+```{r, echo=TRUE}
+#Check for NULL values in suppliment
+sum(is.na(ToothGrowth$supp))
+```
+
+```{r, echo=TRUE}
+#Check for NULL values in dosage
+sum(is.na(ToothGrowth$dose))
+```
+Looking at the explorations above, since there is no indication of the participants being paired, we can assume that the data is unpaired meaning each subject wasn't expose to more that one suppliment and dosage types. And since the data doesn't present any missing values we don't need to omit any observations.
+
+1.2.High level view of difference in dosages and suppliments
+```{r, echo=TRUE}
+library(ggplot2)
+# Boxplot the data for each dosage to see the discribution and which dosage may seem to be the obtimal.
+ggplot(aes(x=dose, y=len), data=ToothGrowth) + geom_boxplot(aes(fill=dose)) + xlab("Dosage") + ylab("Tooth Length")  + ggtitle("Tooth Length vs. Dosage") + 
+     theme(plot.title = element_text(lineheight=1.0, face="bold"))
+```
+
+```{r}
+# Boxplot the data for each suppliments to see the discribution and which suppliment may seem to be the obtimal.
+ggplot(aes(x=supp, y=len), data=ToothGrowth) + geom_boxplot(aes(fill=supp)) + xlab("Supplement") + ylab("Tooth Length") + ggtitle("Tooth Length vs. Suppliment") + 
+     theme(plot.title = element_text(lineheight=1.0, face="bold"))
+```
+
+The above diagrams seem to be pointing to highest dosage of 2 yielding the maximum toothgrowth and OJ suppliment also yieling the maximum toothgrowth.
+
+```{r}
+# run t-test for the significance in the difference between suppliments
+t.test(len~supp,data=ToothGrowth,alternative="two.sided")
+```
+Above p-value indicates value greater that 0.06063 which is not with in the rejjection region if we use a 5% significance level. There for we cannot reject H0 which assumes that there is no difference in the mean of suppliments. Thus we can't say if the suppliments make a difference in tooth growth using our current sample dataset.
+
+```{r}
+# run t-test for the significance in the difference between 1.0 and 0.5 dosages
+t.test(len~dose,data=subset(ToothGrowth, ToothGrowth$dose %in% c(1.0,0.5)),alternative="two.sided")
+```
+
+```{r}
+# run t-test for the significance in the difference between 0.5 and 2.0 dosages
+t.test(len~dose,data=subset(ToothGrowth, ToothGrowth$dose %in% c(0.5,2.0)),alternative="two.sided")
+```
+
+```{r}
+# run t-test for the significance in the difference between 1.0 and 2.0 dosages
+t.test(len~dose,data=subset(ToothGrowth, ToothGrowth$dose %in% c(1.0,2.0)),alternative="two.sided")
+```
+
+Above p-value shoow that we can reject the null hypothesis of the means of the different dosages being equal for either pair comparisons. This indicates that the since dose 2 or highest dosage shows high tooth growth compared to the others. Dose 2 is the most optimal if the objective was to maximise tooth growth.
+
+### Conclusion
+Under the assumptions the Central Limit Theroem we assumed that the data could be approximated to the normal distribution and we use the Student T Test for measuring significance in testing. We also used the two-sided test as we wanted to determine if there are any difference in tooth growth between the 2 suppliment and the 3 dosages. The result show no significant difference in tooth growth when comparing the suppliments making us not to be able to confidently say which suppliment is better but there dosages show the opposite with dose 2 yielding the highest tooth growth results.
